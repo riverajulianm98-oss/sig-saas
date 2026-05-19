@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.env
+!.env.example
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Alembic / local DB
+*.db
+
+# Node (frontend)
+node_modules/
+.next/
+dist/
+
+venv/
+__pycache__/
+*.pyc
+.env
+node_modules/
+dist/
+build/
+coverage/
+.vscode/
+.cursor/
+.idea/
+.DS_Store

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sig-saas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sig_user
+      POSTGRES_PASSWORD: sig_password
+      POSTGRES_DB: sig_saas
+    ports:
+      - "5432:5432"
+    volumes:
+      - sig_saas_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sig_user -d sig_saas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sig_saas_pgdata:
