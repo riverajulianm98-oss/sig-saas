@@ -33,6 +33,13 @@ node_modules/
 .next/
 dist/
 
+# Root-level package files (accidental installs outside frontend/)
+/package.json
+/package-lock.json
+
+# Claude Code local config
+.claude/
+
 venv/
 __pycache__/
 *.pyc
