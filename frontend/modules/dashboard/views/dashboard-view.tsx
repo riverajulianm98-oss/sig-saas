@@ -12,14 +12,17 @@ import { StatCard } from '../components/stat-card'
 import { ComplianceScore } from '../components/compliance-score'
 import { FindingsChart } from '../components/findings-chart'
 import { useAuditDashboard } from '../hooks/use-dashboard'
+import { useDocumentAlerts } from '@/modules/documents/hooks/use-documents'
 import { useAuthStore } from '@/store/auth.store'
 
 export function DashboardView() {
   const { user } = useAuthStore()
   const { data, isLoading } = useAuditDashboard()
+  const { data: docAlerts } = useDocumentAlerts()
 
   const score = data?.avg_compliance_score ?? null
   const findingsBySeverity = data?.findings_by_severity ?? {}
+  const expiredDocs = (docAlerts?.expired?.length ?? 0) + (docAlerts?.expiring_critical?.length ?? 0)
 
   return (
     <div className="space-y-6">
@@ -49,6 +52,14 @@ export function DashboardView() {
           description={`${data?.open_findings ?? 0} hallazgos abiertos`}
           icon={AlertTriangle}
           variant={data?.critical_findings ? 'danger' : 'success'}
+          loading={isLoading}
+        />
+        <StatCard
+          title="Docs. vencidos/críticos"
+          value={expiredDocs}
+          description={`${docAlerts?.expiring_soon?.length ?? 0} próximos a vencer`}
+          icon={FileText}
+          variant={expiredDocs > 0 ? 'warning' : 'success'}
           loading={isLoading}
         />
         <StatCard
