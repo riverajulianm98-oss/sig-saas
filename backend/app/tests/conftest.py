@@ -1,3 +1,5 @@
+import os
+import tempfile
 from collections.abc import Generator
 
 import pytest
@@ -6,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.core.config import get_settings
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import create_app
@@ -19,8 +22,21 @@ def db_engine():
         poolclass=StaticPool,
     )
     Base.metadata.create_all(bind=engine)
+    session_factory = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    session = session_factory()
+    from app.modules.audit_templates.seeder import seed_system_templates
+
+    seed_system_templates(session)
+    session.commit()
+    session.close()
     yield engine
     Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture
+def seed_iso_templates(db_engine):
+    """Ensures global ISO templates exist (seeded in db_engine fixture)."""
+    yield
 
 
 @pytest.fixture
@@ -33,6 +49,10 @@ def db_session(db_engine) -> Generator[Session, None, None]:
 
 @pytest.fixture
 def client(db_session: Session) -> Generator[TestClient, None, None]:
+    os.environ["STORAGE_PROVIDER"] = "local"
+    os.environ["STORAGE_LOCAL_PATH"] = tempfile.mkdtemp()
+    get_settings.cache_clear()
+
     app = create_app()
 
     def override_get_db() -> Generator[Session, None, None]:

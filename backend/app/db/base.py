@@ -10,4 +10,27 @@ class Base(DeclarativeBase):
 
 
 # Import models so Alembic autogenerate detects metadata.
-from app.infrastructure.models import Tenant, User  # noqa: F401, E402
+from app.infrastructure.models import (  # noqa: F401, E402
+    Audit,
+    AuditActionPlan,
+    AuditActivityLog,
+    AuditChecklist,
+    AuditEvidence,
+    AuditFinding,
+    AuditFindingSuggestion,
+    AuditFindingSuggestionHistory,
+    AuditPlan,
+    AuditResponse,
+    ChecklistQuestion,
+    ChecklistSection,
+    ChecklistTemplate,
+    ChecklistTemplateVersion,
+    Document,
+    DocumentAuditLog,
+    DocumentVersion,
+    RefreshToken,
+    Tenant,
+    TenantFindingGenerationSettings,
+    TenantDocumentSettings,
+    User,
+)

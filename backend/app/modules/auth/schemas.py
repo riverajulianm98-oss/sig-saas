@@ -35,11 +35,25 @@ class LoginRequest(BaseModel):
     )
 
 
-class TokenResponse(BaseModel):
+class TokenPairResponse(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
     expires_in: int
+    refresh_expires_in: int
     tenant_id: uuid.UUID
+
+
+# Backward-compatible alias
+TokenResponse = TokenPairResponse
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class LogoutRequest(BaseModel):
+    refresh_token: str
 
 
 class UserResponse(BaseModel):
@@ -69,4 +83,4 @@ class TenantResponse(BaseModel):
 class RegisterResponse(BaseModel):
     tenant: TenantResponse
     user: UserResponse
-    token: TokenResponse
+    token: TokenPairResponse

@@ -20,6 +20,9 @@ python-jose[cryptography]==3.5.0
 bcrypt==4.2.1
 email-validator==2.2.0
 
+# Object storage (S3 / MinIO / R2)
+boto3==1.37.38
+
 # Dev / test
 httpx==0.28.1
 pytest==8.3.5

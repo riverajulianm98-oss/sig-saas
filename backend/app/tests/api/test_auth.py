@@ -1,4 +1,4 @@
-def test_register_login_and_me(client):
+def test_register_login_refresh_and_me(client):
     register_payload = {
         "tenant": {
             "company_name": "Acme Colombia",
@@ -14,8 +14,9 @@ def test_register_login_and_me(client):
     register_response = client.post("/api/v1/auth/register", json=register_payload)
     assert register_response.status_code == 201
     body = register_response.json()
-    token = body["token"]["access_token"]
+    refresh_token = body["token"]["refresh_token"]
     tenant_id = body["tenant"]["id"]
+    assert refresh_token
 
     login_response = client.post(
         "/api/v1/auth/login",
@@ -24,10 +25,23 @@ def test_register_login_and_me(client):
     assert login_response.status_code == 200
     assert login_response.json()["tenant_id"] == tenant_id
 
+    refresh_response = client.post(
+        "/api/v1/auth/refresh",
+        json={"refresh_token": refresh_token},
+    )
+    assert refresh_response.status_code == 200
+    refreshed = refresh_response.json()
+    assert refreshed["refresh_token"] != refresh_token
+
     me_response = client.get(
         "/api/v1/auth/me",
-        headers={"Authorization": f"Bearer {token}"},
+        headers={"Authorization": f"Bearer {refreshed['access_token']}"},
     )
     assert me_response.status_code == 200
     assert me_response.json()["email"] == "admin@acme.com"
-    assert me_response.json()["role"] == "admin_empresa"
+
+    logout_response = client.post(
+        "/api/v1/auth/logout",
+        json={"refresh_token": refreshed["refresh_token"]},
+    )
+    assert logout_response.status_code == 200

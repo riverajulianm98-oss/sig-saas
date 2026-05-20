@@ -1,7 +1,9 @@
 """Password hashing and JWT utilities."""
 
+import hashlib
+import secrets
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 import bcrypt
@@ -10,6 +12,7 @@ from jose import JWTError, jwt
 from app.core.config import Settings, get_settings
 
 ALGORITHM = "HS256"
+TokenType = Literal["access", "refresh"]
 
 
 def hash_password(password: str) -> str:
@@ -40,21 +43,41 @@ def create_access_token(
         "tenant_id": str(tenant_id),
         "role": role,
         "exp": expire,
+        "iat": datetime.now(UTC),
+        "jti": secrets.token_urlsafe(16),
         "type": "access",
     }
     return jwt.encode(payload, settings.jwt_secret_key, algorithm=ALGORITHM)
+
+
+def decode_token(
+    token: str,
+    *,
+    expected_type: TokenType,
+    settings: Settings | None = None,
+) -> dict[str, Any] | None:
+    """Returns payload or None if token is invalid, expired, or wrong type."""
+    settings = settings or get_settings()
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[ALGORITHM])
+        if payload.get("type") != expected_type:
+            return None
+        return payload
+    except JWTError:
+        return None
 
 
 def decode_access_token(
     token: str,
     settings: Settings | None = None,
 ) -> dict[str, Any] | None:
-    """Returns payload or None if token is invalid/expired."""
-    settings = settings or get_settings()
-    try:
-        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[ALGORITHM])
-        if payload.get("type") != "access":
-            return None
-        return payload
-    except JWTError:
-        return None
+    return decode_token(token, expected_type="access", settings=settings)
+
+
+def generate_refresh_token_value() -> str:
+    """Opaque refresh token returned once to the client."""
+    return secrets.token_urlsafe(48)
+
+
+def hash_refresh_token(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
