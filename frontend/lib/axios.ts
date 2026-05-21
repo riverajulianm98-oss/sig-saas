@@ -1,11 +1,19 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { API_BASE, TOKEN_KEYS } from './constants'
+import { isDemoMode } from './demo-mode'
+import { createDemoAdapter } from './demo-interceptor'
 
 const apiClient = axios.create({
   baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 })
+
+// Inject demo adapter when DEMO_MODE is active
+if (isDemoMode()) {
+  const original = apiClient.defaults.adapter as unknown as Parameters<typeof createDemoAdapter>[0]
+  apiClient.defaults.adapter = createDemoAdapter(original) as unknown as typeof apiClient.defaults.adapter
+}
 
 // ── Request interceptor: attach access token + tenant header ──────────────────
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {

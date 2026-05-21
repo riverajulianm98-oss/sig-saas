@@ -16,6 +16,8 @@ import { useAuth } from '@/hooks/use-auth'
 import { initials } from '@/lib/utils'
 import { ROLE_LABELS } from '@/lib/constants'
 import { Breadcrumbs } from './breadcrumbs'
+import { DemoTourButton } from '@/components/demo/demo-tour'
+import { isDemoMode } from '@/lib/demo-mode'
 
 export function Navbar() {
   const { resolvedTheme, setTheme } = useTheme()
@@ -26,6 +28,7 @@ export function Navbar() {
       <Breadcrumbs />
 
       <div className="flex items-center gap-2">
+        {isDemoMode() && <DemoTourButton />}
         {/* Theme toggle */}
         <Button
           variant="ghost"
