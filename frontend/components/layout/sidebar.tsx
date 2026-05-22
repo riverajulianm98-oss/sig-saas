@@ -13,6 +13,7 @@ import {
   Shield,
   AlertTriangle,
   BarChart3,
+  CheckCircle2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/store/ui.store'
@@ -45,6 +46,12 @@ const navItems = [
     label: 'Hallazgos',
     href: '/findings',
     icon: AlertTriangle,
+    minRole: 0,
+  },
+  {
+    label: 'CAPA',
+    href: '/capa',
+    icon: CheckCircle2,
     minRole: 0,
   },
   {

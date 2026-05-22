@@ -4,6 +4,8 @@ import {
   DEMO_AUDITS_LIST, DEMO_AUDITS, DEMO_CHECKLIST, DEMO_FINDINGS,
   DEMO_SUGGESTIONS, DEMO_EVIDENCES, DEMO_COMPLIANCE, DEMO_TIMELINE,
   DEMO_TEMPLATES, DEMO_ME_RESPONSE, DEMO_LOGIN_RESPONSE, DEMO_MAIN_DASHBOARD,
+  DEMO_ALL_FINDINGS, DEMO_CAPA_ACTIONS,
+  DEMO_CAPA_DASHBOARD, DEMO_FINDINGS_DASHBOARD, DEMO_FINDING_TIMELINE,
 } from './demo-data'
 
 function mockResponse(data: unknown, config: AxiosRequestConfig): AxiosResponse {
@@ -23,6 +25,82 @@ function matchDemoData(url: string, method: string, params: Record<string, unkno
   if (url === '/auth/me' || url.endsWith('/auth/me')) return DEMO_ME_RESPONSE
   if (url === '/auth/refresh' || url.endsWith('/auth/refresh')) return DEMO_LOGIN_RESPONSE
   if (url === '/auth/logout' || url.endsWith('/auth/logout')) return { message: 'Logged out' }
+
+  // ── Standalone Findings module ────────────────────────────────────────────
+  if (url.match(/\/findings\/dashboard/)) return DEMO_FINDINGS_DASHBOARD
+
+  // Finding actions (must match before /findings/:id)
+  if (url.match(/\/findings\/[^/]+\/actions\/[^/]+\/status/)) {
+    const parts = url.split('/')
+    const aid = parts[parts.indexOf('actions') + 1]
+    const action = DEMO_CAPA_ACTIONS.find((a) => a.id === aid) ?? DEMO_CAPA_ACTIONS[0]
+    return { ...action, status: (body as Record<string, string>)?.status ?? action.status, updated_at: new Date().toISOString() }
+  }
+  if (url.match(/\/findings\/[^/]+\/actions\/[^/]+\/comments/)) {
+    return { id: `cmt-${Date.now()}`, capa_id: url.split('/').find((_, i, a) => a[i - 1] === 'actions') ?? 'acc-001', user_id: 'demo-user-001', user_name: 'Alejandro Gómez', content: (body as Record<string, string>)?.content ?? '', created_at: new Date().toISOString() }
+  }
+  if (url.match(/\/findings\/[^/]+\/actions\/[^/]+/)) {
+    const aid = url.split('/').pop()!
+    const action = DEMO_CAPA_ACTIONS.find((a) => a.id === aid) ?? DEMO_CAPA_ACTIONS[0]
+    if (method === 'patch') return { ...action, ...(body as object), updated_at: new Date().toISOString() }
+    return action
+  }
+  if (url.match(/\/findings\/[^/]+\/actions/)) {
+    const fid = url.split('/')[url.split('/').indexOf('findings') + 1]
+    if (method === 'post') {
+      const b = body as Record<string, unknown>
+      const finding = DEMO_ALL_FINDINGS.find((f) => f.id === fid) ?? DEMO_ALL_FINDINGS[0]
+      return { id: `acc-new-${Date.now()}`, tenant_id: 'demo-tenant-001', finding_id: fid, finding_code: finding.code, finding_title: finding.title, code: null, status: 'pendiente', responsible_user_id: null, responsible_name: null, verifier_user_id: null, verifier_name: null, due_date: null, start_date: null, completed_at: null, verified_at: null, effectiveness_score: null, comments_count: 0, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), ...b }
+    }
+    return DEMO_CAPA_ACTIONS.filter((a) => a.finding_id === fid)
+  }
+  if (url.match(/\/findings\/[^/]+\/timeline/)) {
+    const fid = url.split('/')[url.split('/').indexOf('findings') + 1]
+    return DEMO_FINDING_TIMELINE(fid)
+  }
+
+  // Finding CRUD
+  if (url.match(/\/findings\/[^/]+$/)) {
+    const id = url.split('/').pop()!
+    if (method === 'delete') return { message: 'Deleted' }
+    const finding = DEMO_ALL_FINDINGS.find((f) => f.id === id) ?? DEMO_ALL_FINDINGS[0]
+    if (method === 'patch') return { ...finding, ...(body as object), updated_at: new Date().toISOString() }
+    const actions = DEMO_CAPA_ACTIONS.filter((a) => a.finding_id === id)
+    const timeline = DEMO_FINDING_TIMELINE(id)
+    return { ...finding, actions, timeline }
+  }
+  if (url.match(/\/findings$/)) {
+    if (method === 'post') {
+      const b = body as Record<string, unknown>
+      return { id: `fin-new-${Date.now()}`, tenant_id: 'demo-tenant-001', audit_id: null, audit_code: null, audit_title: null, code: null, status: 'abierto', source: 'inspeccion', root_cause: null, root_cause_category: null, actions_count: 0, open_actions_count: 0, is_recurrent: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), responsible_user_id: null, responsible_name: null, ...b }
+    }
+    const search = String(params.search ?? '').toLowerCase()
+    const filtered = DEMO_ALL_FINDINGS.filter((f) => {
+      if (search && !f.title.toLowerCase().includes(search) && !(f.code ?? '').toLowerCase().includes(search)) return false
+      if (params.classification && f.classification !== params.classification) return false
+      if (params.severity && f.severity !== params.severity) return false
+      if (params.status && f.status !== params.status) return false
+      if (params.source && f.source !== params.source) return false
+      if (params.process_area && f.process_area !== params.process_area) return false
+      if (params.audit_id && f.audit_id !== params.audit_id) return false
+      return true
+    })
+    const skip = Number(params.skip ?? 0)
+    const limit = Number(params.limit ?? 20)
+    return { items: filtered.slice(skip, skip + limit), total: filtered.length, skip, limit }
+  }
+
+  // ── CAPA dashboard ─────────────────────────────────────────────────────────
+  if (url.match(/\/capa\/dashboard/)) return DEMO_CAPA_DASHBOARD
+  if (url.match(/\/capa\/actions/)) {
+    const statusFilter = params.status as string | undefined
+    const filtered = statusFilter
+      ? DEMO_CAPA_ACTIONS.filter((a) => a.status === statusFilter)
+      : DEMO_CAPA_ACTIONS
+    const skip = Number(params.skip ?? 0)
+    const limit = Number(params.limit ?? 50)
+    return { items: filtered.slice(skip, skip + limit), total: filtered.length }
+  }
 
   // Dashboard (main)
   if (url.match(/\/audits\/dashboard$/)) return DEMO_AUDIT_DASHBOARD
@@ -51,7 +129,6 @@ function matchDemoData(url: string, method: string, params: Record<string, unkno
     return DEMO_COMPLIANCE(id)
   }
   if (url.match(/\/audit-templates\/audits/)) {
-    const id = (body as Record<string, string>)?.template_id ? 'aud-new' : 'aud-new'
     return { ...DEMO_AUDITS[0], id: 'aud-new', code: (body as Record<string, string>)?.code ?? 'AUD-NEW', title: (body as Record<string, string>)?.title ?? 'Nueva Auditoría' }
   }
   if (url.match(/\/audit-templates/)) return DEMO_TEMPLATES

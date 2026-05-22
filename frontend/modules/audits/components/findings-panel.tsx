@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Loader2, AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
+import { Plus, Loader2, AlertTriangle, ExternalLink } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -239,7 +240,16 @@ export function FindingsPanel({ auditId, canCreate }: FindingsPanelProps) {
                 </span>
               </div>
 
-              <p className="text-sm font-medium">{finding.title}</p>
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-medium">{finding.title}</p>
+                <Link
+                  href={`/findings/${finding.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex-shrink-0 flex items-center gap-1 text-[11px] text-[hsl(var(--primary))] hover:underline"
+                >
+                  Ver <ExternalLink className="h-3 w-3" />
+                </Link>
+              </div>
               <p className="text-xs text-[hsl(var(--muted-foreground))] line-clamp-2">{finding.description}</p>
 
               <div className="flex items-center gap-4 text-xs text-[hsl(var(--muted-foreground))]">

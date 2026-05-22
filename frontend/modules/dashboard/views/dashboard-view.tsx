@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuditDashboard } from '../hooks/use-dashboard'
 import { useDocumentAlerts } from '@/modules/documents/hooks/use-documents'
+import { useFindingsDashboard, useCapaDashboard } from '@/modules/findings/hooks/use-findings'
 import { useAuthStore } from '@/store/auth.store'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DemoTourButton } from '@/components/demo/demo-tour'
@@ -121,6 +122,8 @@ export function DashboardView() {
   const { user } = useAuthStore()
   const { data, isLoading } = useAuditDashboard()
   const { data: docAlerts } = useDocumentAlerts()
+  const { data: findingsDash } = useFindingsDashboard()
+  const { data: capaDash } = useCapaDashboard()
 
   const score = data?.avg_compliance_score ? Math.round(data.avg_compliance_score) : null
   const expiredDocs = (docAlerts?.expired?.length ?? 0) + (docAlerts?.expiring_critical?.length ?? 0)
@@ -216,6 +219,32 @@ export function DashboardView() {
         </div>
       </div>
 
+      {/* Findings + CAPA summary strip */}
+      {(findingsDash || capaDash) && (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Link href="/findings" className="group rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 hover:border-[hsl(var(--primary))]/30 hover:shadow-md transition-all">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(var(--muted-foreground))]">Hallazgos abiertos</p>
+            <p className="text-2xl font-black mt-1 text-red-600 dark:text-red-400">{findingsDash?.abiertos ?? '—'}</p>
+            <p className="text-[11px] text-[hsl(var(--muted-foreground))] mt-0.5">{findingsDash?.criticos ?? 0} críticos · {findingsDash?.vencidos ?? 0} vencidos</p>
+          </Link>
+          <Link href="/findings?status=en_seguimiento" className="group rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 hover:border-[hsl(var(--primary))]/30 hover:shadow-md transition-all">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(var(--muted-foreground))]">En seguimiento</p>
+            <p className="text-2xl font-black mt-1 text-yellow-600 dark:text-yellow-400">{findingsDash?.en_seguimiento ?? '—'}</p>
+            <p className="text-[11px] text-[hsl(var(--muted-foreground))] mt-0.5">{findingsDash?.total ?? 0} hallazgos totales</p>
+          </Link>
+          <Link href="/capa" className="group rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 hover:border-[hsl(var(--primary))]/30 hover:shadow-md transition-all">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(var(--muted-foreground))]">Acciones CAPA abiertas</p>
+            <p className="text-2xl font-black mt-1 text-blue-600 dark:text-blue-400">{capaDash ? (capaDash.pendiente + capaDash.en_progreso + capaDash.validacion) : '—'}</p>
+            <p className="text-[11px] text-[hsl(var(--muted-foreground))] mt-0.5">{capaDash?.vencidas ?? 0} vencidas · {capaDash?.cerrada ?? 0} cerradas</p>
+          </Link>
+          <Link href="/capa" className="group rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 hover:border-[hsl(var(--primary))]/30 hover:shadow-md transition-all">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(var(--muted-foreground))]">Tiempo prom. cierre</p>
+            <p className="text-2xl font-black mt-1">{capaDash?.avg_close_days != null ? `${capaDash.avg_close_days}d` : '—'}</p>
+            <p className="text-[11px] text-[hsl(var(--muted-foreground))] mt-0.5">{capaDash?.reincidencias ?? 0} hallazgos reincidentes</p>
+          </Link>
+        </div>
+      )}
+
       {/* Bottom row: findings + activity */}
       <div className="grid gap-4 lg:grid-cols-2">
 
@@ -264,7 +293,7 @@ export function DashboardView() {
               { label: 'Nueva auditoría', icon: ClipboardCheck, href: '/audits', color: 'text-blue-600 bg-blue-500/10' },
               { label: 'Ver documentos', icon: FileText, href: '/documents', color: 'text-purple-600 bg-purple-500/10' },
               { label: 'Hallazgos abiertos', icon: AlertTriangle, href: '/findings', color: 'text-red-500 bg-red-500/10' },
-              { label: 'Seguimiento auditorías', icon: TrendingUp, href: '/audits', color: 'text-emerald-600 bg-emerald-500/10' },
+              { label: 'Panel CAPA', icon: CheckCircle2, href: '/capa', color: 'text-emerald-600 bg-emerald-500/10' },
             ].map(({ label, icon: Icon, href, color }) => (
               <Link
                 key={href + label}
