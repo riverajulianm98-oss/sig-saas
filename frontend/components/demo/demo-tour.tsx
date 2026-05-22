@@ -7,46 +7,60 @@ import { Button } from '@/components/ui/button'
 
 const STEPS = [
   {
-    title: 'Dashboard principal',
-    description: 'Vista ejecutiva con KPIs de compliance, hallazgos críticos y estado de auditorías. Todo en tiempo real.',
+    title: 'Dashboard ejecutivo',
+    description: 'Vista principal con KPIs de compliance, hallazgos críticos, auditorías activas y distribución de riesgo. Todo el SIG en una pantalla.',
     href: '/dashboard',
-    highlight: 'Métricas globales del SIG',
+    highlight: 'Compliance 87% · 10 hallazgos · 3 auditorías',
     emoji: '📊',
   },
   {
-    title: 'Documentos ISO',
-    description: 'Gestiona todos los documentos del sistema: procedimientos, formatos, instructivos, políticas y manuales con control de versiones.',
+    title: 'Control documental',
+    description: 'Gestiona procedimientos, formatos, instructivos y políticas con versionado, flujo de aprobación y alertas de vencimiento automáticas.',
     href: '/documents',
-    highlight: '15 documentos controlados',
+    highlight: '15 documentos controlados · 3 próximos a vencer',
     emoji: '📄',
   },
   {
-    title: 'Auditorías enterprise',
-    description: 'Planifica y ejecuta auditorías ISO 9001, 14001 y 45001 con checklists automáticos desde templates.',
+    title: 'Auditorías ISO',
+    description: 'Planifica y ejecuta auditorías 9001, 14001 y 45001 con checklists interactivos, evidencias por ítem y score por cláusula.',
     href: '/audits',
-    highlight: '8 auditorías activas',
+    highlight: '8 auditorías activas · Tab "Checklist" para ver en acción',
     emoji: '🔍',
   },
   {
-    title: 'Detalle de auditoría',
-    description: 'Vista detallada con checklist interactivo, hallazgos, sugerencias IA, evidencias, compliance por cláusula y timeline de actividad.',
-    href: '/audits/aud-002',
-    highlight: 'ISO 14001 certificación en proceso',
-    emoji: '📋',
-  },
-  {
-    title: 'Hallazgos inteligentes (IA)',
-    description: 'Motor de sugerencias automáticas analiza respuestas del checklist y propone hallazgos con confidence score. Aprueba, descarta o convierte en acción correctiva.',
+    title: 'IA para hallazgos',
+    description: 'El motor de IA analiza respuestas del checklist y propone hallazgos con confidence score. Aprueba, descarta o convierte en CAPA.',
     href: '/audits/aud-003',
-    highlight: 'IA → tab Hallazgos IA',
+    highlight: 'Tab "Hallazgos IA" → sugerencias automáticas',
     emoji: '✨',
   },
   {
-    title: 'Compliance visual',
-    description: 'Score por cláusula, distribución cumple/parcial/no cumple y progreso del checklist con gráficos interactivos.',
-    href: '/audits/aud-001',
-    highlight: '87% compliance auditado',
+    title: 'Hallazgos con trazabilidad',
+    description: 'Registro completo de no conformidades con causa raíz (metodología 6M), evidencias, clasificación y pipeline CAPA integrado.',
+    href: '/findings',
+    highlight: '10 hallazgos · 3 críticos · Filtros por severidad',
+    emoji: '⚠️',
+  },
+  {
+    title: 'CAPA — Acciones correctivas',
+    description: 'Kanban completo de acciones correctivas con estados (Pendiente → En progreso → Validación → Cerrada) y control de vencimientos.',
+    href: '/capa',
+    highlight: '15 acciones · Avanzar estado directamente en el tablero',
+    emoji: '✅',
+  },
+  {
+    title: 'Analytics — Centro ejecutivo',
+    description: 'Tendencias 12 meses, mapa de calor por proceso, cumplimiento ISO por cláusula, gauge de riesgo global e insights IA.',
+    href: '/analytics',
+    highlight: 'Botón "Presentación" para modo pantalla completa',
     emoji: '📈',
+  },
+  {
+    title: 'Reportes',
+    description: 'Genera informes ejecutivos en PDF, Excel o CSV con selección de módulos, filtro por proceso y rango de fechas. Descarga inmediata.',
+    href: '/reports',
+    highlight: 'Haz clic en "Generar reporte" para descargar un PDF',
+    emoji: '📥',
   },
 ]
 
@@ -59,9 +73,7 @@ export function DemoTour({ onClose }: DemoTourProps) {
   const [step, setStep] = useState(0)
   const current = STEPS[step]
 
-  const goTo = (href: string) => {
-    router.push(href)
-  }
+  const goTo = (href: string) => router.push(href)
 
   const next = () => {
     if (step < STEPS.length - 1) {
@@ -110,7 +122,7 @@ export function DemoTour({ onClose }: DemoTourProps) {
         {/* Content */}
         <div className="px-5 py-4 space-y-2">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">{current.emoji}</span>
+            <span className="text-2xl shrink-0">{current.emoji}</span>
             <div>
               <h3 className="font-semibold text-base">{current.title}</h3>
               <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1 leading-relaxed">
@@ -127,13 +139,7 @@ export function DemoTour({ onClose }: DemoTourProps) {
 
         {/* Actions */}
         <div className="flex items-center justify-between px-5 pb-4 gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={prev}
-            disabled={step === 0}
-            className="gap-1"
-          >
+          <Button variant="ghost" size="sm" onClick={prev} disabled={step === 0} className="gap-1">
             <ChevronLeft className="h-3.5 w-3.5" /> Anterior
           </Button>
           <Button variant="ghost" size="sm" onClick={onClose} className="text-[hsl(var(--muted-foreground))]">
@@ -157,7 +163,7 @@ export function DemoTourButton() {
         onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 rounded-lg border border-[hsl(var(--primary))]/30 bg-[hsl(var(--primary))]/10 px-3 py-1.5 text-xs font-medium text-[hsl(var(--primary))] transition-all hover:bg-[hsl(var(--primary))]/20"
       >
-        <Map className="h-3.5 w-3.5" /> Ver recorrido
+        <Map className="h-3.5 w-3.5" /> Tour guiado
       </button>
       {open && <DemoTour onClose={() => setOpen(false)} />}
     </>

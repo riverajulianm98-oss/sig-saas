@@ -6,6 +6,8 @@ import {
   DEMO_TEMPLATES, DEMO_ME_RESPONSE, DEMO_LOGIN_RESPONSE, DEMO_MAIN_DASHBOARD,
   DEMO_ALL_FINDINGS, DEMO_CAPA_ACTIONS,
   DEMO_CAPA_DASHBOARD, DEMO_FINDINGS_DASHBOARD, DEMO_FINDING_TIMELINE,
+  DEMO_EXECUTIVE_SUMMARY, DEMO_ANALYTICS_TRENDS, DEMO_PROCESS_HEATMAP,
+  DEMO_CLAUSE_SCORES, DEMO_AI_INSIGHTS,
 } from './demo-data'
 
 function mockResponse(data: unknown, config: AxiosRequestConfig): AxiosResponse {
@@ -19,12 +21,20 @@ function mockResponse(data: unknown, config: AxiosRequestConfig): AxiosResponse 
   }
 }
 
-function matchDemoData(url: string, method: string, params: Record<string, unknown>, body: unknown): unknown | null {
+export function matchDemoData(url: string, method: string, params: Record<string, unknown>, body: unknown): unknown | null {
   // Auth
   if (url === '/auth/login' || url.endsWith('/auth/login')) return DEMO_LOGIN_RESPONSE
   if (url === '/auth/me' || url.endsWith('/auth/me')) return DEMO_ME_RESPONSE
   if (url === '/auth/refresh' || url.endsWith('/auth/refresh')) return DEMO_LOGIN_RESPONSE
   if (url === '/auth/logout' || url.endsWith('/auth/logout')) return { message: 'Logged out' }
+
+  // ── Analytics / Executive Center ──────────────────────────────────────────
+  if (url.match(/\/analytics\/executive/))     return DEMO_EXECUTIVE_SUMMARY
+  if (url.match(/\/analytics\/trends/))        return DEMO_ANALYTICS_TRENDS
+  if (url.match(/\/analytics\/process-heatmap/)) return DEMO_PROCESS_HEATMAP
+  if (url.match(/\/analytics\/clause-scores/)) return DEMO_CLAUSE_SCORES
+  if (url.match(/\/analytics\/insights/))      return DEMO_AI_INSIGHTS
+  if (url.match(/\/reports\/generate/))        return { url: '#', filename: 'reporte_sigcya.pdf', message: 'Reporte generado exitosamente' }
 
   // ── Standalone Findings module ────────────────────────────────────────────
   if (url.match(/\/findings\/dashboard/)) return DEMO_FINDINGS_DASHBOARD

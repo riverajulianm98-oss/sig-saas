@@ -8,6 +8,8 @@ import {
 import { useAuditDashboard } from '../hooks/use-dashboard'
 import { useDocumentAlerts } from '@/modules/documents/hooks/use-documents'
 import { useFindingsDashboard, useCapaDashboard } from '@/modules/findings/hooks/use-findings'
+import { useAiInsights } from '@/modules/reports/hooks/use-analytics'
+import { AiInsights } from '@/modules/reports/components/ai-insights'
 import { useAuthStore } from '@/store/auth.store'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DemoTourButton } from '@/components/demo/demo-tour'
@@ -124,6 +126,7 @@ export function DashboardView() {
   const { data: docAlerts } = useDocumentAlerts()
   const { data: findingsDash } = useFindingsDashboard()
   const { data: capaDash } = useCapaDashboard()
+  const { data: insights, isLoading: loadingInsights } = useAiInsights()
 
   const score = data?.avg_compliance_score ? Math.round(data.avg_compliance_score) : null
   const expiredDocs = (docAlerts?.expired?.length ?? 0) + (docAlerts?.expiring_critical?.length ?? 0)
@@ -245,8 +248,8 @@ export function DashboardView() {
         </div>
       )}
 
-      {/* Bottom row: findings + activity */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      {/* Bottom row: findings + activity + insights */}
+      <div className="grid gap-4 lg:grid-cols-3">
 
         {/* Findings severity */}
         <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6">
@@ -294,6 +297,7 @@ export function DashboardView() {
               { label: 'Ver documentos', icon: FileText, href: '/documents', color: 'text-purple-600 bg-purple-500/10' },
               { label: 'Hallazgos abiertos', icon: AlertTriangle, href: '/findings', color: 'text-red-500 bg-red-500/10' },
               { label: 'Panel CAPA', icon: CheckCircle2, href: '/capa', color: 'text-emerald-600 bg-emerald-500/10' },
+              { label: 'Analytics', icon: TrendingUp, href: '/analytics', color: 'text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10' },
             ].map(({ label, icon: Icon, href, color }) => (
               <Link
                 key={href + label}
@@ -307,6 +311,11 @@ export function DashboardView() {
               </Link>
             ))}
           </div>
+        </div>
+
+        {/* AI insights */}
+        <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6">
+          <AiInsights data={insights} isLoading={loadingInsights} compact />
         </div>
       </div>
     </div>

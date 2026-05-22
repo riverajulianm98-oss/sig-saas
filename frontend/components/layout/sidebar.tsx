@@ -10,10 +10,11 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Shield,
   AlertTriangle,
   BarChart3,
   CheckCircle2,
+  TrendingUp,
+  Download,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/store/ui.store'
@@ -21,7 +22,7 @@ import { useAuthStore } from '@/store/auth.store'
 import { ROLE_LEVEL } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
-import { APP_NAME } from '@/lib/constants'
+import { SIGLogo } from '@/components/brand/logo'
 
 const navItems = [
   {
@@ -52,6 +53,18 @@ const navItems = [
     label: 'CAPA',
     href: '/capa',
     icon: CheckCircle2,
+    minRole: 0,
+  },
+  {
+    label: 'Analytics',
+    href: '/analytics',
+    icon: TrendingUp,
+    minRole: 0,
+  },
+  {
+    label: 'Reportes',
+    href: '/reports',
+    icon: Download,
     minRole: 0,
   },
   {
@@ -96,10 +109,7 @@ export function Sidebar() {
             sidebarCollapsed && 'justify-center px-0'
           )}
         >
-          <Shield className="h-6 w-6 shrink-0 text-[hsl(var(--primary))]" />
-          {!sidebarCollapsed && (
-            <span className="ml-2 text-sm font-semibold tracking-tight">{APP_NAME}</span>
-          )}
+          <SIGLogo size={28} variant={sidebarCollapsed ? 'icon' : 'full'} />
         </div>
 
         {/* Nav */}

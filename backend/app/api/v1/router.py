@@ -7,6 +7,7 @@ from app.modules.finding_intelligence.router import router as finding_intelligen
 from app.modules.audits.router import router as audits_router
 from app.modules.documents.router import router as documents_router
 from app.modules.users.router import router as users_router
+from app.modules.analytics.router import router as analytics_router
 
 api_v1_router = APIRouter()
 api_v1_router.include_router(health.router)
@@ -16,3 +17,4 @@ api_v1_router.include_router(documents_router)
 api_v1_router.include_router(audits_router)
 api_v1_router.include_router(audit_templates_router)
 api_v1_router.include_router(finding_intelligence_router)
+api_v1_router.include_router(analytics_router)

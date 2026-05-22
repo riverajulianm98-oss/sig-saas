@@ -303,3 +303,77 @@ export const DEMO_FINDING_TIMELINE = (findingId: string) => {
   }
   return entries
 }
+
+// ─── Analytics & Executive Center ────────────────────────────────────────────
+export const DEMO_EXECUTIVE_SUMMARY = {
+  compliance_score: 87,
+  compliance_trend: 15,
+  open_findings: 10,
+  findings_trend: -2,
+  overdue_capa: 5,
+  capa_trend: -3,
+  active_audits: 3,
+  docs_expiring: 2,
+  risk_level: 'medio' as const,
+  risk_by_area: { bajo: 35, medio: 45, alto: 20 },
+  last_updated: new Date().toISOString(),
+}
+
+export const DEMO_ANALYTICS_TRENDS = {
+  months: ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr', 'May'],
+  compliance: [72, 74, 71, 78, 76, 79, 81, 77, 83, 85, 82, 87],
+  capa_completion: [55, 58, 62, 65, 68, 65, 70, 72, 74, 78, 80, 83],
+  findings_open: [14, 15, 13, 12, 13, 12, 11, 10, 11, 9, 10, 10],
+  recurrence_rate: [20, 18, 22, 15, 17, 14, 12, 16, 11, 9, 13, 8],
+  audits_count: [2, 1, 3, 2, 4, 2, 3, 2, 4, 3, 2, 4],
+}
+
+export const DEMO_PROCESS_HEATMAP = [
+  { process: 'Producción',       critica: 3, alta: 4, media: 2, baja: 1, risk_score: 85 },
+  { process: 'Medio Ambiente',   critica: 2, alta: 3, media: 2, baja: 0, risk_score: 76 },
+  { process: 'HSEQ',             critica: 2, alta: 3, media: 3, baja: 1, risk_score: 72 },
+  { process: 'Logística',        critica: 1, alta: 2, media: 2, baja: 0, risk_score: 58 },
+  { process: 'Calidad',          critica: 1, alta: 2, media: 4, baja: 2, risk_score: 52 },
+  { process: 'Compras',          critica: 0, alta: 2, media: 1, baja: 1, risk_score: 40 },
+  { process: 'Comercial',        critica: 0, alta: 1, media: 2, baja: 1, risk_score: 28 },
+  { process: 'Recursos Humanos', critica: 0, alta: 1, media: 2, baja: 1, risk_score: 25 },
+  { process: 'Dirección',        critica: 0, alta: 1, media: 1, baja: 1, risk_score: 22 },
+  { process: 'TI',               critica: 0, alta: 0, media: 1, baja: 2, risk_score: 15 },
+]
+
+export const DEMO_CLAUSE_SCORES = [
+  { clause: '4', label: 'Contexto de la organización', score: 88 },
+  { clause: '5', label: 'Liderazgo',                   score: 78 },
+  { clause: '6', label: 'Planificación',               score: 71 },
+  { clause: '7', label: 'Soporte',                     score: 85 },
+  { clause: '8', label: 'Operación',                   score: 65 },
+  { clause: '9', label: 'Evaluación del desempeño',    score: 80 },
+  { clause: '10', label: 'Mejora continua',             score: 72 },
+]
+
+export const DEMO_AI_INSIGHTS = [
+  {
+    id: 'ins-001', type: 'risk',
+    title: 'Riesgo elevado en Producción',
+    body: 'Producción concentra el 35% de hallazgos críticos. Tendencia de recurrencia en calibración de equipos. Se recomienda auditoría extraordinaria antes de Q3 2025.',
+    icon: '⚠️', severity: 'alta', created_at: D(0),
+  },
+  {
+    id: 'ins-002', type: 'trend',
+    title: 'Compliance +15% en 6 meses',
+    body: 'El score global pasó de 72% a 87% en 6 meses. El cierre efectivo de CAPA en Calidad y TI explica el avance. Proyección: alcanzar 90%+ en Q3 2025.',
+    icon: '📈', severity: 'positivo', created_at: D(0),
+  },
+  {
+    id: 'ins-003', type: 'action',
+    title: '5 acciones CAPA vencidas — acción requerida',
+    body: 'Áreas: Producción (3), Medio Ambiente (2). El incumplimiento puede comprometer la certificación ISO 14001 programada para junio 2025.',
+    icon: '🔴', severity: 'critica', created_at: D(0),
+  },
+  {
+    id: 'ins-004', type: 'opportunity',
+    title: 'Digitalizar aprobaciones ahorra 5 días por proceso',
+    body: 'Implementar firma digital eliminaría 5 días hábiles promedio por aprobación documental. ROI estimado: 120 horas/año por coordinador.',
+    icon: '💡', severity: 'mejora', created_at: D(0),
+  },
+]
