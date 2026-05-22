@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: sig_password
       POSTGRES_DB: sig_saas
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - sig_saas_pgdata:/var/lib/postgresql/data
     healthcheck:
