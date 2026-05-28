@@ -15,6 +15,10 @@ import {
   CheckCircle2,
   TrendingUp,
   Download,
+  Zap,
+  Shield,
+  CreditCard,
+  Activity,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/store/ui.store'
@@ -68,6 +72,12 @@ const navItems = [
     minRole: 0,
   },
   {
+    label: 'Automatización',
+    href: '/automation',
+    icon: Zap,
+    minRole: 0,
+  },
+  {
     label: 'Indicadores',
     href: '/kpis',
     icon: BarChart3,
@@ -81,10 +91,29 @@ const navItems = [
     minRole: ROLE_LEVEL['coordinador_sig'],
   },
   {
+    label: 'Uso y consumo',
+    href: '/usage',
+    icon: Activity,
+    minRole: ROLE_LEVEL['admin_empresa'],
+  },
+  {
+    label: 'Facturación',
+    href: '/settings/billing',
+    icon: CreditCard,
+    minRole: ROLE_LEVEL['admin_empresa'],
+  },
+  {
     label: 'Configuración',
     href: '/settings',
     icon: Settings,
     minRole: ROLE_LEVEL['admin_empresa'],
+  },
+  {
+    label: 'Super Admin',
+    href: '/admin',
+    icon: Shield,
+    minRole: ROLE_LEVEL['super_admin'] ?? 99,
+    badge: 'Admin',
   },
 ]
 

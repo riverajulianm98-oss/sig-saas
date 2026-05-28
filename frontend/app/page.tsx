@@ -1,20 +1,5 @@
-'use client'
-
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/store/auth.store'
+import { redirect } from 'next/navigation'
 
 export default function RootPage() {
-  const router = useRouter()
-  const { isAuthenticated } = useAuthStore()
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard')
-    } else {
-      router.replace('/landing')
-    }
-  }, [isAuthenticated, router])
-
-  return null
+  redirect('/landing')
 }

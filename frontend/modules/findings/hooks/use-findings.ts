@@ -3,6 +3,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { findingsService } from '@/services/findings.service'
 import type {
+  FindingResponse,
+  FindingDetail,
+  FindingListResponse,
   FindingSearchParams,
   FindingCreateRequest,
   FindingUpdateRequest,
@@ -101,7 +104,18 @@ export function useUpdateFinding(id: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: FindingUpdateRequest) => findingsService.update(id, data),
-    onSuccess: () => {
+    onMutate: async (data) => {
+      await qc.cancelQueries({ queryKey: FINDINGS_KEYS.detail(id) })
+      const previous = qc.getQueryData<FindingDetail>(FINDINGS_KEYS.detail(id))
+      if (previous) {
+        qc.setQueryData<FindingDetail>(FINDINGS_KEYS.detail(id), { ...previous, ...data })
+      }
+      return { previous }
+    },
+    onError: (_err, _data, ctx) => {
+      if (ctx?.previous) qc.setQueryData(FINDINGS_KEYS.detail(id), ctx.previous)
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: FINDINGS_KEYS.detail(id) })
       qc.invalidateQueries({ queryKey: FINDINGS_KEYS.lists() })
       qc.invalidateQueries({ queryKey: FINDINGS_KEYS.dashboard() })
@@ -113,7 +127,19 @@ export function useDeleteFinding() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => findingsService.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: FINDINGS_KEYS.lists() })
+      const snapshots = qc.getQueriesData<FindingListResponse>({ queryKey: FINDINGS_KEYS.lists() })
+      qc.setQueriesData<FindingListResponse>({ queryKey: FINDINGS_KEYS.lists() }, (old) => {
+        if (!old) return old
+        return { ...old, items: old.items.filter((f: FindingResponse) => f.id !== id), total: old.total - 1 }
+      })
+      return { snapshots }
+    },
+    onError: (_err, _id, ctx) => {
+      ctx?.snapshots.forEach(([key, data]) => qc.setQueryData(key, data))
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: FINDINGS_KEYS.lists() })
       qc.invalidateQueries({ queryKey: FINDINGS_KEYS.dashboard() })
     },

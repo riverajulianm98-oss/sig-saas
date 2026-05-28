@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -156,6 +157,10 @@ function DashboardMockup() {
 export default function LandingPage() {
   const router = useRouter()
   const { isAuthenticated } = useAuthStore()
+
+  useEffect(() => {
+    if (isAuthenticated) router.replace('/dashboard')
+  }, [isAuthenticated, router])
 
   const enterDemo = () => {
     const { setAuth } = useAuthStore.getState()
